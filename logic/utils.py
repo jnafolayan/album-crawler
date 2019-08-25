@@ -49,11 +49,13 @@ def download_file(url, file_name, album_name):
                 f.write(data)
             print('File downloaded to: {}'.format(download_path))
 
-    except:
+    except KeyboardInterrupt:
+        print('Download stopped. Removing file...')
         f.close()
         os.unlink(download_path)
         if len(os.listdir(album_path)) == 0:
             os.rmdir(album_path)
+        print('File removed.')
         return None
 
     return download_path
