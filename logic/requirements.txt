@@ -1,2 +1,4 @@
-requests=2.22.0
-tqdm=4.35.0
+requests==2.22.0
+tqdm==4.35.0
+musicbrainzng==0.6
+spotipy==2.4.4

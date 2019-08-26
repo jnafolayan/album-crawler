@@ -3,6 +3,11 @@ import os
 import requests
 from tqdm import tqdm
 
+from api_calls import (
+    get_album_data_spotify,
+    get_album_data_lastfm
+)
+
 
 DOWNLOAD_PATH =\
         os.path.join(os.path.dirname(os.path.dirname(__file__)), 'downloads')
@@ -61,5 +66,8 @@ def download_file(url, file_name, album_name):
     return download_path
 
 
-# test
-download_file('http://sr-sycdn.kuwo.cn/resource/n1/73/60/707899178.mp3', 'Lover - Taylor Swift', 'Lover - Single')
+def get_album_data(query: str):
+    album = get_album_data_spotify(query)
+    if album is None:
+        album = get_album_data_lastfm(query)
+    return album

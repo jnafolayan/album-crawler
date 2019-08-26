@@ -50,7 +50,7 @@ class Album:
         self.cover_art_link = ''
 
     def __str__(self):
-        return self.tracklist
+        return str(self.tracklist)
 
     def __getitem__(self, index):
         if not isinstance(index, int):
@@ -63,4 +63,4 @@ class Album:
     def add_track(self, track: Track):
         if not isinstance(track, Track):
             raise TypeError('Album class only accepts Track objects')
-        self.tracks.append(track)
+        self.tracklist.append(track)
