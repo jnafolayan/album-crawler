@@ -12,7 +12,7 @@ from logging_config import *
 
 
 DOWNLOAD_PATH =\
-        os.path.join(os.path.dirname(os.path.dirname(__file__)), 'downloads')
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'downloads')
 if not os.path.exists(DOWNLOAD_PATH):
     os.mkdir(DOWNLOAD_PATH)
 
@@ -87,6 +87,9 @@ def download_song(url, album_name, file_name):
 
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
+
+    download_path = os.path.join(path, '{}.mp3'.format(file_name))
+    return download_path
 
 
 def get_album_data(query: str):

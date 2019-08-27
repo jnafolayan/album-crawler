@@ -17,6 +17,7 @@ class Track:
         self.download_link = ''
         self.album = album
         self.id = None
+        self.file_path = ''
 
         if self.album is None:
             single_name = '{} - Single'.format(self.title)
@@ -28,11 +29,8 @@ class Track:
         creates a string representation in format:
         `id - title ft. features - artiste`
         """
-        features =\
-            [artist for artist in self.features if artist not in self.artiste]
-        features = 'ft. ' + ', '.join(features) if features else ''
-        artiste = ', '.join(self.artiste)
-        return '{} - {} {} - {}'.format(self.id, self.title, features, artiste)
+        return '{} - {} - {}'.format(self.id, self.title_to_string,
+                                     self.artiste_to_string)
 
     def __repr__(self):
         return '<Track: {}>'.format(self.title)
@@ -40,6 +38,30 @@ class Track:
     @property
     def search_term(self):
         return '{} {}'.format(self.title, ' '.join(self.artiste))
+
+    @property
+    def artiste_to_string(self):
+        return ', '.join(self.artiste)
+
+    @property
+    def title_to_string(self):
+
+        try:
+            for artiste in self.artiste:
+                self.features.remove(artiste)
+        except ValueError:
+            pass
+
+        if len([ft for ft in self.features if ft in self.title]) ==\
+                len(self.features):
+            return '{}'.format(self.title)
+
+        elif len(self.features) == 0:
+            return '{}'.format(self.title)
+
+        else:
+            features = 'ft. ' + ', '.join(self.features)
+            return '{} {}'.format(self.title, features)
 
 
 class Album:
@@ -55,6 +77,7 @@ class Album:
         self.artiste = artiste
         self.tracklist = []
         self.cover_art_link = ''
+        self.cover_art_path = ''
 
     def __str__(self):
         return str(self.tracklist)
