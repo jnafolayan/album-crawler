@@ -129,7 +129,6 @@ def get_track_url_youtube(query: str):
         q=query + ' audio',
         part='snippet',
         maxResults=3,
-        order='videoCount',
         type='video'
     ).execute()
 

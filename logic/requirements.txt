@@ -5,3 +5,4 @@ spotipy==2.4.4
 bs4==0.0.1
 youtube-dl==2019.8.13
 google-api-python-client==1.7.11
+eyeD3==0.8.10
