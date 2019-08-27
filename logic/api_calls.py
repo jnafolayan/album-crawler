@@ -70,8 +70,7 @@ def get_album_data_spotify(query: str):
     takes a query string and returns data on album query if found
     : params query: string, a search term for finding albums
 
-    :returns new_album: logic.school.Album, a list of logic.school.Track
-                        objects
+    :returns new_album: logic.school.Album object
 
     :excepts KeyError: returns none, when data isn't found
     """
@@ -115,14 +114,14 @@ def get_track_url_youtube(query: str):
     gets streaming url for tracks from youtube
     :params query: string, to search for the track
 
-    :params url: string, url for the audio file
+    :returns url: string, url for the audio file
     """
 
     api_key = os.environ.get('GOOGLE_API_KEY')
     api_service = 'youtube'
     api_version = 'v3'
 
-    youtube = build(api_service, api_version, developerKey=api_key, 
+    youtube = build(api_service, api_version, developerKey=api_key,
                     cache_discovery=False)
 
     logging.info('Getting Youtube results for query: {}'.format(query))

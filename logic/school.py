@@ -37,6 +37,10 @@ class Track:
     def __repr__(self):
         return '<Track: {}>'.format(self.title)
 
+    @property
+    def search_term(self):
+        return '{} {}'.format(self.title, ' '.join(self.artiste))
+
 
 class Album:
     def __init__(self, name: str, artiste: list):
@@ -64,7 +68,7 @@ class Album:
             raise IndexError('Index out of range.')
 
     @property
-    def to_str(self):
+    def to_string(self):
         return '{} - {}'.format(self.name, ', '.join(self.artiste))
 
     def add_track(self, track: Track):
