@@ -60,6 +60,10 @@ class Album:
         else:
             raise IndexError('Index out of range.')
 
+    @property
+    def to_str(self):
+        return '{} - {}'.format(self.name, ', '.join(self.artiste))
+
     def add_track(self, track: Track):
         if not isinstance(track, Track):
             raise TypeError('Album class only accepts Track objects')

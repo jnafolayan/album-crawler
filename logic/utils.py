@@ -15,7 +15,7 @@ if not os.path.exists(DOWNLOAD_PATH):
     os.mkdir(DOWNLOAD_PATH)
 
 
-def download_file(url, album_name, file_name=None, file_name_ext=None):
+def download_file(url, album_name, file_name=None):
     """
     params url: string containing the media file url
     params file_name: string for the storage name of the file to be downloaded
@@ -31,7 +31,7 @@ def download_file(url, album_name, file_name=None, file_name_ext=None):
         raise FileNotFoundError('Could not find the file you were looking for')
 
     dfile_name = url.split('/')[-1]
-    ext = dfile_name.split('.')[-1] if not file_name_ext else file_name_ext
+    ext = response.headers['content-type'].split('/')[-1]
 
     file_name = dfile_name if not file_name else '{}.{}'.format(file_name, ext)
 
