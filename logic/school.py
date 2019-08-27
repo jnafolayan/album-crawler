@@ -16,6 +16,7 @@ class Track:
         self.features = features
         self.download_link = ''
         self.album = album
+        self.id = None
 
         if self.album is None:
             single_name = '{} - Single'.format(self.title)
@@ -25,11 +26,13 @@ class Track:
     def __str__(self):
         """
         creates a string representation in format:
-        `title ft. features - artiste`
+        `id - title ft. features - artiste`
         """
-        features = 'ft. ' + ', '.join(self.features) if self.features else ''
+        features =\
+            [artist for artist in self.features if artist not in self.artiste]
+        features = 'ft. ' + ', '.join(features) if features else ''
         artiste = ', '.join(self.artiste)
-        return '{} {} - {}'.format(self.title, features, artiste)
+        return '{} - {} {} - {}'.format(self.id, self.title, features, artiste)
 
     def __repr__(self):
         return '<Track: {}>'.format(self.title)
@@ -67,4 +70,5 @@ class Album:
     def add_track(self, track: Track):
         if not isinstance(track, Track):
             raise TypeError('Album class only accepts Track objects')
+        track.id = len(self.tracklist) + 1
         self.tracklist.append(track)

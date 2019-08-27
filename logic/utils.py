@@ -1,12 +1,14 @@
 import os
 
 import requests
+import youtube_dl
 from tqdm import tqdm
 
 from api_calls import (
     get_album_data_spotify,
     get_album_data_lastfm
 )
+from logging_config import *
 
 
 DOWNLOAD_PATH =\
@@ -28,7 +30,8 @@ def download_file(url, album_name, file_name=None):
     try:
         response = requests.get(url)
     except requests.exceptions.RequestException:
-        raise FileNotFoundError('Could not find the file you were looking for')
+        logging.warning('Could not get url: {}'.format(url))
+        return None
 
     dfile_name = url.split('/')[-1]
     ext = response.headers['content-type'].split('/')[-1]
@@ -45,6 +48,7 @@ def download_file(url, album_name, file_name=None):
 
     try:
         with open(download_path, 'wb') as f:
+            logging.info('Downloading file: {}'.format(file_name))
             written = 0
             for data in tqdm(response.iter_content(),
                              total=file_size,
@@ -52,18 +56,37 @@ def download_file(url, album_name, file_name=None):
                              unit_scale=True):
                 written += len(data)
                 f.write(data)
-            print('File downloaded to: {}'.format(download_path))
+            logging.info('Download complete, file downloaded to: {}'
+                         .format(download_path))
 
     except KeyboardInterrupt:
-        print('Download stopped. Removing file...')
+        logging.warning('Download stopped. Removing file at {}...'
+                        .format(download_path))
         f.close()
         os.unlink(download_path)
         if len(os.listdir(album_path)) == 0:
             os.rmdir(album_path)
-        print('File removed.')
+        logging.info('File removed.')
         return None
 
     return download_path
+
+
+def download_song(url, album_name, file_name):
+    path = os.path.join(DOWNLOAD_PATH, album_name)
+
+    ydl_opts = {
+        'format': 'bestaudio/best',
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '320'
+        }],
+        'outtmpl': os.path.join(path, '{}.%(ext)s'.format(file_name))
+    }
+
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
 
 
 def get_album_data(query: str):

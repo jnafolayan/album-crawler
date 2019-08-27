@@ -5,8 +5,10 @@ import requests
 import musicbrainzngs
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+from googleapiclient.discovery import build
 
 from school import Track, Album
+from logging.config import *
 
 
 def get_album_data_lastfm(query: str):  # deprecated, spotify API is superior
@@ -79,10 +81,12 @@ def get_album_data_spotify(query: str):
     credentials_manager = SpotifyClientCredentials(client_id=client_id,
                                                    client_secret=client_secret)
     sp = spotipy.Spotify(client_credentials_manager=credentials_manager)
+    logging.info('Searching Spotify for query: {}'.format(query))
     results = sp.search(q='album: ' + query, type='album')
     try:
         album_id = results['albums']['items'][0]['id']
     except KeyError:
+        logging.warning('Query "{}", has no matches'.format(query))
         return None  # album not found
 
     album = sp.album(album_id)
@@ -96,10 +100,46 @@ def get_album_data_spotify(query: str):
     for track in album['tracks']['items']:
         track = Track(
             title=track['name'],
-            artiste=track['artists'][0]['name'],
+            artiste=[track['artists'][0]['name']],
             features=[artist['name'] for artist in track['artists']][0:],
             album=new_album
         )
         new_album.add_track(track)
 
+    logging.info('Album data retrieved for: {}'.format(album_name))
     return new_album
+
+
+def get_track_url_youtube(query: str):
+    """
+    gets streaming url for tracks from youtube
+    :params query: string, to search for the track
+
+    :params url: string, url for the audio file
+    """
+
+    api_key = os.environ.get('GOOGLE_API_KEY')
+    api_service = 'youtube'
+    api_version = 'v3'
+
+    youtube = build(api_service, api_version, developerKey=api_key, 
+                    cache_discovery=False)
+
+    logging.info('Getting Youtube results for query: {}'.format(query))
+    results = youtube.search().list(
+        q=query + ' audio',
+        part='snippet',
+        maxResults=3,
+        order='videoCount',
+        type='video'
+    ).execute()
+
+    try:
+        first_result = results['items'][0]['id']['videoId']
+        url = 'https://youtube.com/watch?v={}'.format(first_result)
+    except IndexError:
+        logging.info('No results found for: "{}"'.format(query))
+        return None
+
+    logging.info('Url gotten for query: {}'.format(url))
+    return url

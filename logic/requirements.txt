@@ -2,3 +2,6 @@ requests==2.22.0
 tqdm==4.35.0
 musicbrainzng==0.6
 spotipy==2.4.4
+bs4==0.0.1
+youtube-dl==2019.8.13
+google-api-python-client==1.7.11
