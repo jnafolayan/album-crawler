@@ -77,7 +77,6 @@ def download_file(url, album_name, file_name=None):
 
     return download_path
 
-
 def download_song(url, album_name, file_name):
     path = os.path.join(DOWNLOAD_PATH, album_name)
 
@@ -97,14 +96,13 @@ def download_song(url, album_name, file_name):
     download_path = os.path.join(path, '{}.mp3'.format(file_name))
     return download_path
 
-
 def get_album_data(query: str):
     album = get_album_data_spotify(query)
     if album is None:
         album = get_album_data_lastfm(query)
     return album
 
-def zip_music_files(path, album_obj):
+def zip_music_files(path: str, album_obj: Album):
     """Compresses the requested album for download by the user
     
     Arguments:
