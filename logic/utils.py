@@ -120,15 +120,16 @@ def zip_music_files(album_obj: Album):
 
     album_archive_name = f"{album_obj.to_string}.zip"
     album_archive_path = os.path.join(ARCHIVE_PATH, album_archive_name)
-    music_files = [file for file in os.listdir() if file.endswith(".mp3")]
 
     with zipfile.ZipFile(album_archive_path, "w") as album_archive:
-        for music_file in music_files:
-            print("Compressing file...")
+        for music_file in os.listdir():
+            logging.info('Compressing file: {}'.format(music_file))
             album_archive.write(music_file, compress_type=zipfile.ZIP_DEFLATED)
             os.remove(music_file)
 
     os.chdir(original_dir)
+    os.rmdir(album_obj.dir_path)
+    album_obj.dir_path = ''
 
 
 def encode_metadata(track: Track):
