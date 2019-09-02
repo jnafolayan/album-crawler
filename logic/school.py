@@ -78,6 +78,7 @@ class Album:
         self.tracklist = []
         self.cover_art_link = ''
         self.cover_art_path = ''
+        self.dir_path = ''
 
     def __str__(self):
         return str(self.tracklist)

@@ -1,10 +1,12 @@
 import os
-
 import zipfile
+
 import requests
 import youtube_dl
+import eyed3
 from tqdm import tqdm
 
+from school import Album, Track
 from api_calls import (
     get_album_data_spotify,
     get_album_data_lastfm
@@ -12,13 +14,13 @@ from api_calls import (
 from logging_config import *
 
 
-DOWNLOAD_PATH =\
-    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'downloads')
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+DOWNLOAD_PATH = os.path.join(BASE_DIR, 'downloads')
 if not os.path.exists(DOWNLOAD_PATH):
     os.mkdir(DOWNLOAD_PATH)
 
-ARCHIVE_PATH = \
-    os.path.join("../", "archives")
+ARCHIVE_PATH = os.path.join(BASE_DIR, 'archives')
 if not os.path.exists(ARCHIVE_PATH):
     os.mkdir(ARCHIVE_PATH)
 
@@ -77,6 +79,7 @@ def download_file(url, album_name, file_name=None):
 
     return download_path
 
+
 def download_song(url, album_name, file_name):
     path = os.path.join(DOWNLOAD_PATH, album_name)
 
@@ -96,21 +99,24 @@ def download_song(url, album_name, file_name):
     download_path = os.path.join(path, '{}.mp3'.format(file_name))
     return download_path
 
+
 def get_album_data(query: str):
     album = get_album_data_spotify(query)
     if album is None:
         album = get_album_data_lastfm(query)
     return album
 
-def zip_music_files(path: str, album_obj: Album):
+
+def zip_music_files(album_obj: Album):
     """Compresses the requested album for download by the user
-    
+
     Arguments:
         path {str} -- [The path where the created .zip file will be stored]
-        album_obj {Album} -- [The album object for which a zip file will be created]
+        album_obj {Album} -- [The album object for which a zip file will be
+                              created]
     """
     original_dir = os.getcwd()
-    os.chdir(DOWNLOAD_PATH)
+    os.chdir(album_obj.dir_path)
 
     album_archive_name = f"{album_obj.to_string}.zip"
     album_archive_path = os.path.join(ARCHIVE_PATH, album_archive_name)
@@ -123,3 +129,29 @@ def zip_music_files(path: str, album_obj: Album):
             os.remove(music_file)
 
     os.chdir(original_dir)
+
+
+def encode_metadata(track: Track):
+    """
+    sets the metadata for downloaded tracks
+    :params track: Track object
+    """
+
+    meta = eyed3.load(track.file_path)
+    logging.info('Setting metadata for track: {}'.format(track.title))
+    if meta.tag is None:
+        meta.initTag()
+
+    logging.debug('Setting artist name - "{}"'.format(track.artiste_to_string))
+    meta.tag.artist = track.artiste_to_string
+    logging.debug('Setting album name - "{}"'.format(track.album.name))
+    meta.tag.album = track.album.name
+    logging.debug('Setting track title - "{}"'.format(track.title_to_string))
+    meta.tag.title = track.title_to_string
+    logging.debug('Setting album art - f"{}"'
+                  .format(track.album.cover_art_path))
+    meta.tag.images.set(3,
+                        open(track.album.cover_art_path, 'rb').read(),
+                        'image/jpeg')
+    meta.tag.save()
+    logging.info('Metadata for track set.')
